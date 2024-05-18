@@ -2,6 +2,7 @@ import { addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../firebase-config";
+import { Button } from "@/components/ui/button";
 
 const DetailPost = () => {
   const { postId } = useParams();
@@ -94,8 +95,8 @@ const DetailPost = () => {
         </ul>
       </div>
 
-      <Link to={"/"} className="p-3 bg-black text-white mt-3 rounded-md">
-        Back
+      <Link to={"/"} className="mt-3">
+        <Button className="">Back</Button>
       </Link>
     </div>
   );
