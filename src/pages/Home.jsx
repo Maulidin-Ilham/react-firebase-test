@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { db } from "../firebase-config";
-import { getDocs, collection } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +16,10 @@ const Home = () => {
 
   useEffect(() => {
     const getPosts = async () => {
+      // ambil collection post
       const postRef = collection(db, "posts");
+
+      // fungsi buat ambil data collection post dan biar bisa di map (udah bawaan)
       const snapshot = await getDocs(postRef);
       const postList = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -21,14 +30,33 @@ const Home = () => {
     };
 
     getPosts();
-  }, []);
+  }, [posts]);
 
-  const deleteHandler = () => {
-    console.log("delete");
+  const deleteHandler = async (id) => {
+    try {
+      // ambil single data di post berdasarkan id
+      const postDoc = doc(db, "posts", id);
+
+      // fungsi bawaan firestore buat delete berdasarkan id
+      await deleteDoc(postDoc);
+    } catch (error) {
+      console.log("error");
+    }
   };
 
-  const editHandler = () => {
-    console.log("edit");
+  const editHandler = async (id) => {
+    try {
+      // ambil single data di post berdasarkan id
+      const postDoc = doc(db, "posts", id);
+
+      // fungsi bawaan firestore buat update berdasarkan id
+      await updateDoc(postDoc, {
+        title: "title baru statis",
+        post: "post baru statis",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <div className=" flex justify-center items-center flex-col">
@@ -45,10 +73,16 @@ const Home = () => {
             <h1>Post: {post.post}</h1>
 
             <div className="flex flex-row space-x-3 mt-2">
-              <Button className="bg-accent" onClick={editHandler}>
+              <Button
+                className="bg-accent"
+                onClick={() => editHandler(post.id)}
+              >
                 Edit
               </Button>
-              <Button className="bg-destructive" onClick={deleteHandler}>
+              <Button
+                className="bg-destructive"
+                onClick={() => deleteHandler(post.id)}
+              >
                 Delete
               </Button>
               <Link to={`${post.id}`}>
