@@ -67,32 +67,38 @@ const Home = () => {
         </Link>
       </div>
       <div className="flex flex-col space-y-4 w-[400px]">
-        {posts.map((post) => (
-          <div key={post.id} className="shadow-lg mt-4 p-3 rounded ">
-            <h1>Title: {post.title}</h1>
-            <h1>Post: {post.post}</h1>
+        {posts.length > 0 &&
+          posts.map((post) => (
+            <div key={post.id} className="shadow-lg mt-4 p-3 rounded ">
+              <h1>Title: {post.title}</h1>
+              <h1>Post: {post.post}</h1>
 
-            <div className="flex flex-row space-x-3 mt-2">
-              <Button
-                className="bg-accent"
-                onClick={() => editHandler(post.id)}
-              >
-                Edit
-              </Button>
-              <Button
-                className="bg-destructive"
-                onClick={() => deleteHandler(post.id)}
-              >
-                Delete
-              </Button>
-              <Link to={`${post.id}`}>
-                <Button className="bg-primary" onClick={deleteHandler}>
-                  Detail
+              <div className="flex flex-row space-x-3 mt-2">
+                <Button
+                  className="bg-accent"
+                  onClick={() => editHandler(post.id)}
+                >
+                  Edit
                 </Button>
-              </Link>
+                <Button
+                  className="bg-destructive"
+                  onClick={() => deleteHandler(post.id)}
+                >
+                  Delete
+                </Button>
+                <Link to={`${post.id}`}>
+                  <Button className="bg-primary" onClick={deleteHandler}>
+                    Detail
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        {posts.length <= 0 ? (
+          <>
+            <h1>No post yes</h1>
+          </>
+        ) : null}
       </div>
     </div>
   );

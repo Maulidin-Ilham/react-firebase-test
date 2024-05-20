@@ -12,13 +12,23 @@ const DetailPost = () => {
 
   useEffect(() => {
     const fetchPostAndComments = async () => {
+      // ambil post berdasarkan id nya
       const postRef = doc(db, "posts", postId);
-      const postSnap = await getDoc(postRef);
-      if (postSnap.exists()) {
-        setPost({ id: postSnap.id, ...postSnap.data() });
 
-        const commentsRef = collection(db, "posts", postId, "comments");
-        const commentsSnap = await getDocs(commentsRef);
+      // disini karena hanya 1 data yang diambil makanya pake getDoc ( gk pake s)
+      const postSnap = await getDoc(postRef);
+
+      // ini set post
+      setPost({ id: postSnap.id, ...postSnap.data() });
+
+      // ini artinya ambil collection comment di sebuah post
+      const commentsRef = collection(db, "posts", postId, "comments");
+
+      // trs kita ambil semua data collectionnya makanya pake getDocs pake s, beda sama yang berdasarkan id tadi
+      const commentsSnap = await getDocs(commentsRef);
+
+      // exist disini buat ngecek, apakah ada comment atau tidak, jika ada ya lakukan seperti biasa ini
+      if (commentsSnap.exists()) {
         const commentsList = commentsSnap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -33,12 +43,20 @@ const DetailPost = () => {
   }, [postId]);
 
   const handleAddComment = async () => {
+    // ini artinya misalnya user ngisi input kosongan (cuma spasi) itu gk dihitung
     if (newComment.trim() !== "") {
       try {
+        // seperti biasa dia ambil collection comments
+        // cara bacanya -> dari db ambil collection post -> dari situ ambil id post -> setelah itu ambil collection comment nya
         const commentRef = collection(db, "posts", postId, "comments");
+
+        // fungsi nambah ke collection comments
         await addDoc(commentRef, { comment: newComment });
 
+        // ini ambil semua comments
         const commentsSnap = await getDocs(commentRef);
+
+        // ini update comment karena ada comment baru
         const updatedComments = commentsSnap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
