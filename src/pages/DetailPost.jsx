@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftIcon } from "lucide-react";
 
 import { usePost } from "@/services/queries";
 import { useCreateCommentPost } from "@/services/mutations";
 
 import { Button } from "@/components/ui/button";
+import { auth } from "@/firebase-config";
 
 const DetailPost = () => {
   const { postId } = useParams();
@@ -13,10 +14,13 @@ const DetailPost = () => {
 
   const [comment, setComment] = useState("");
 
+  const currentUser = auth.currentUser;
   const { data, isLoading, isSuccess, isError, error } = usePost(postId);
   const { mutateAsync: createCommentPost, isPending } = useCreateCommentPost();
 
   const handleCommentPost = async () => {
+    if (!comment) return;
+
     await createCommentPost(
       { postId, comment },
       {
@@ -51,16 +55,32 @@ const DetailPost = () => {
         <div className="flex flex-col gap-2 mt-5">
           <input
             type="text"
+            disabled={currentUser === null}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Add a comment..."
             className="p-2 border border-gray-400 rounded"
           />
-          <Button type="button" onClick={handleCommentPost}>
+          <Button
+            type="button"
+            disabled={currentUser === null}
+            onClick={handleCommentPost}
+          >
             {isPending ? "Loading..." : "Add comment"}
           </Button>
         </div>
-
+        {!currentUser && (
+          <div className="my-4">
+            <p>
+              {" "}
+              You must{" "}
+              <Link to="/login" className="italic text-blue-500">
+                Login
+              </Link>{" "}
+              to add a comment
+            </p>
+          </div>
+        )}
         <div className="mt-5">
           <h1>Comment {data.comments.length}</h1>
           <ul>

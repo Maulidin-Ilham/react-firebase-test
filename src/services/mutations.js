@@ -1,5 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCommentPost, createPost, deletePost, updatePost } from "./api";
+
+import {
+  createCommentPost,
+  createPost,
+  deletePost,
+  googleLogin,
+  updatePost,
+} from "./api";
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
@@ -46,6 +54,25 @@ export const useCreateCommentPost = () => {
     },
     onError: (error) => {
       console.log(error);
+    },
+  });
+};
+
+export const useLoginWithGoogle = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: async () => await googleLogin(),
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      queryClient.setQueriesData(["user"], data.user);
+    },
+    onSettled: () => {
+      navigate("/", { replace: true });
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
 };

@@ -1,16 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase-config";
+
 import { usePosts } from "@/services/queries";
 import { useDeletePost, useUpdatePost } from "@/services/mutations";
 
 import { Button } from "@/components/ui/button";
-import { getAuth, signOut } from "firebase/auth";
 
 const Home = () => {
   const navigate = useNavigate();
 
   // ini untuk ngecek udah login apa blm
-  const auth = getAuth();
   const currentUser = auth.currentUser;
   const { data: posts, isLoading, isSuccess, isError, error } = usePosts();
   const { mutate: deletePost, isPending: isPendingDeletePost } =
@@ -34,7 +35,8 @@ const Home = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/login");
+      localStorage.removeItem("token");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Error during logout:", error.message);
     }
@@ -65,18 +67,22 @@ const Home = () => {
               </div>
 
               <div className="flex flex-row gap-3 ">
-                <Button
-                  className="bg-accent"
-                  onClick={() => editHandler(post.id)}
-                >
-                  {isPendingUpdatePost ? "Editing..." : "Edit"}
-                </Button>
-                <Button
-                  className="bg-destructive"
-                  onClick={() => deleteHandler(post.id)}
-                >
-                  {isPendingDeletePost ? "Deleting..." : "Delete"}
-                </Button>
+                {currentUser && (
+                  <>
+                    <Button
+                      className="bg-accent"
+                      onClick={() => editHandler(post.id)}
+                    >
+                      {isPendingUpdatePost ? "Editing..." : "Edit"}
+                    </Button>
+                    <Button
+                      className="bg-destructive"
+                      onClick={() => deleteHandler(post.id)}
+                    >
+                      {isPendingDeletePost ? "Deleting..." : "Delete"}
+                    </Button>
+                  </>
+                )}
                 <Link to={`${post.id}`}>
                   <Button className="bg-primary" onClick={deleteHandler}>
                     Detail
