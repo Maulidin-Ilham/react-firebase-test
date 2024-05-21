@@ -1,90 +1,62 @@
-import { useEffect } from "react";
-import { db } from "../firebase-config";
-import {
-  getDocs,
-  collection,
-  doc,
-  deleteDoc,
-  updateDoc,
-} from "firebase/firestore";
-import { useState } from "react";
 import { Link } from "react-router-dom";
+
+import { usePosts } from "@/services/queries";
+import { useDeletePost, useUpdatePost } from "@/services/mutations";
+
 import { Button } from "@/components/ui/button";
 
 const Home = () => {
-  const [posts, setPost] = useState([]);
+  const { data: posts, isLoading, isSuccess, isError, error } = usePosts();
+  const { mutate: deletePost, isPending: isPendingDeletePost } =
+    useDeletePost();
+  const { mutate: updatePost, isPending: isPendingUpdatePost } =
+    useUpdatePost();
 
-  useEffect(() => {
-    const getPosts = async () => {
-      // ambil collection post
-      const postRef = collection(db, "posts");
+  const deleteHandler = (postId) => {
+    deletePost(postId);
+  };
 
-      // fungsi buat ambil data collection post dan biar bisa di map (udah bawaan)
-      const snapshot = await getDocs(postRef);
-      const postList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setPost(postList);
+  const editHandler = (postId) => {
+    const newData = {
+      title: "Update data",
+      post: "Ini post yang udah di update datanya cuy",
     };
 
-    getPosts();
-  }, [posts]);
-
-  const deleteHandler = async (id) => {
-    try {
-      // ambil single data di post berdasarkan id
-      const postDoc = doc(db, "posts", id);
-
-      // fungsi bawaan firestore buat delete berdasarkan id
-      await deleteDoc(postDoc);
-    } catch (error) {
-      console.log("error");
-    }
+    updatePost({ postId, data: newData });
   };
 
-  const editHandler = async (id) => {
-    try {
-      // ambil single data di post berdasarkan id
-      const postDoc = doc(db, "posts", id);
+  let content;
 
-      // fungsi bawaan firestore buat update berdasarkan id
-      await updateDoc(postDoc, {
-        title: "title baru statis",
-        post: "post baru statis",
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  return (
-    <div className=" flex justify-center items-center flex-col">
-      <h1>Post </h1>
-      <div className="my-3">
-        <Link to={"/add-post"}>
-          <Button>Add post</Button>
-        </Link>
-      </div>
-      <div className="flex flex-col space-y-4 w-[400px]">
-        {posts.length > 0 &&
+  if (isLoading) {
+    content = <div>Loading...</div>;
+  }
+
+  if (isSuccess) {
+    content = (
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {posts.length > 0 ? (
           posts.map((post) => (
-            <div key={post.id} className="shadow-lg mt-4 p-3 rounded ">
-              <h1>Title: {post.title}</h1>
-              <h1>Post: {post.post}</h1>
+            <div
+              key={post.id}
+              className="p-4 space-y-3 border rounded-md shadow-sm"
+            >
+              <div>
+                <h2 className="text-lg font-semibold">Title: {post.title}</h2>
+                <p>Post: {post.post}</p>
+              </div>
 
-              <div className="flex flex-row space-x-3 mt-2">
+              <div className="flex flex-row gap-3 ">
                 <Button
                   className="bg-accent"
                   onClick={() => editHandler(post.id)}
                 >
-                  Edit
+                  {isPendingUpdatePost ? "Editing..." : "Edit"}
                 </Button>
                 <Button
                   className="bg-destructive"
                   onClick={() => deleteHandler(post.id)}
                 >
-                  Delete
+                  {isPendingDeletePost ? "Deleting..." : "Delete"}
                 </Button>
                 <Link to={`${post.id}`}>
                   <Button className="bg-primary" onClick={deleteHandler}>
@@ -93,14 +65,30 @@ const Home = () => {
                 </Link>
               </div>
             </div>
-          ))}
-        {posts.length <= 0 ? (
-          <>
-            <h1>No post yes</h1>
-          </>
-        ) : null}
+          ))
+        ) : (
+          <p>
+            <i>No posts found</i>
+          </p>
+        )}
       </div>
-    </div>
+    );
+  }
+
+  if (isError) {
+    content = <div>Error: {error.message}</div>;
+  }
+
+  return (
+    <section className="max-w-screen-md px-4 mx-auto my-6">
+      <h1>Post </h1>
+      <div className="my-3">
+        <Link to={"/add-post"}>
+          <Button>Add post</Button>
+        </Link>
+      </div>
+      {content}
+    </section>
   );
 };
 
