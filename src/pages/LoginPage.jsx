@@ -1,41 +1,12 @@
-import { useNavigate } from "react-router-dom";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useLoginWithGoogle } from "@/services/mutations";
 
 import { Button } from "@/components/ui/button";
-import { getAuth } from "firebase/auth";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const { mutateAsync: loginWithGoogle } = useLoginWithGoogle();
 
   const handleLoginWithGoogle = async () => {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
-    try {
-      const googleProvider = new GoogleAuthProvider();
-
-      googleProvider.setCustomParameters({
-        prompt: "select_account",
-      });
-
-      const result = await signInWithPopup(auth, googleProvider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-
-      const token = credential.accessToken;
-      const user = {
-        name: result.user.displayName,
-        email: result.user.email,
-        avatar: result.user.photoURL,
-      };
-      console.log("~Token", token);
-      console.log("~User", user);
-
-      navigate("/", { replace: true });
-    } catch (error) {
-      const credential = GoogleAuthProvider.credentialFromError(error);
-
-      console.error(credential);
-      console.error(error?.message);
-    }
+    await loginWithGoogle();
   };
 
   return (

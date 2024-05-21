@@ -7,8 +7,9 @@ import {
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-import { db } from "@/firebase-config";
+import { auth, db } from "@/firebase-config";
 
 export const getAllPosts = async () => {
   try {
@@ -95,6 +96,38 @@ export const createCommentPost = async ({ postId, comment }) => {
     const commentRef = collection(db, "posts", postId, "comments");
     await addDoc(commentRef, { comment });
   } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const googleLogin = async () => {
+  try {
+    const googleProvider = new GoogleAuthProvider();
+
+    googleProvider.setCustomParameters({
+      prompt: "select_account",
+    });
+
+    const result = await signInWithPopup(auth, googleProvider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+
+    const token = credential.accessToken;
+
+    const user = {
+      name: result.user.displayName,
+      email: result.user.email,
+      avatar: result.user.photoURL,
+    };
+
+    return {
+      token,
+      user,
+    };
+  } catch (error) {
+    const credential = GoogleAuthProvider.credentialFromError(error);
+
+    console.error(credential);
+
     throw new Error(error);
   }
 };

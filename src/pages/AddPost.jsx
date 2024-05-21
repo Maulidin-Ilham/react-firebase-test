@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from "lucide-react";
 
 import { useCreatePost } from "@/services/mutations";
 
@@ -18,55 +19,59 @@ const AddPost = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (title.trim() !== "" && post.trim() !== "") {
-      try {
-        // fungsi firebase buat nambah ke collection "posts"
-        await createPost({ title, post });
+    if (!title || !post) return;
 
-        navigate("/");
-      } catch (error) {
-        console.error("Error adding comment: ", error);
+    await createPost(
+      { title, post },
+      {
+        onSettled: () => {
+          navigate("/");
+
+          setTitle("");
+          setPost("");
+        },
       }
-      setTitle("");
-      setPost("");
-    }
+    );
   };
 
   return (
-    <div className="flex flex-col items-center justify-center ">
-      <h1>Add post</h1>
+    <section className="max-w-screen-md px-4 mx-auto my-6">
+      <div className="mb-3">
+        <Button size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeftIcon className="w-5 h-5 text-white" />
+        </Button>
+      </div>
 
-      <form
-        action=""
-        className="flex flex-col w-6/12 space-y-4 "
-        onSubmit={submitHandler}
-      >
+      <div>
+        <h2 className="text-xl font-semibold text-center">Add post</h2>
+      </div>
+
+      <form onSubmit={submitHandler} className="flex flex-col gap-3">
         <div>
-          <label htmlFor="">Title</label>
+          <label htmlFor="title">Title</label>
           <Input
-            placeholder="title..."
+            id="title"
+            name="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="title..."
           />
         </div>
         <div>
+          <label htmlFor="post">Post</label>
           <Textarea
-            placeholder="post..."
-            className="resize-none w-full h-[180px]"
+            id="post"
+            name="post"
             value={post}
             onChange={(e) => setPost(e.target.value)}
+            placeholder="post..."
+            className="resize-none w-full h-[180px]"
           />
         </div>
 
-        <Button type="submit" disbled={isPending}>
-          {isPending ? "Submiting..." : "Submit"}
-        </Button>
+        <Button type="submit">{isPending ? "Submiting..." : "Submit"}</Button>
       </form>
-
-      <Link to={"/"} className="mt-5">
-        <Button className="text-white bg-black hover:bg-gray-600">Back</Button>
-      </Link>
-    </div>
+    </section>
   );
 };
 
