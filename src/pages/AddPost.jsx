@@ -17,6 +17,7 @@ const AddPost = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
     if (title.trim() !== "" && post.trim() !== "") {
       try {
         // fungsi firebase buat nambah ke collection "posts"

@@ -1,11 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { usePosts } from "@/services/queries";
 import { useDeletePost, useUpdatePost } from "@/services/mutations";
 
 import { Button } from "@/components/ui/button";
+import { getAuth, signOut } from "firebase/auth";
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  // ini untuk ngecek udah login apa blm
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
   const { data: posts, isLoading, isSuccess, isError, error } = usePosts();
   const { mutate: deletePost, isPending: isPendingDeletePost } =
     useDeletePost();
@@ -23,6 +29,19 @@ const Home = () => {
     };
 
     updatePost({ postId, data: newData });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during logout:", error.message);
+    }
+  };
+
+  const loginHandler = () => {
+    navigate("/login");
   };
 
   let content;
@@ -82,6 +101,17 @@ const Home = () => {
   return (
     <section className="max-w-screen-md px-4 mx-auto my-6">
       <h1>Post </h1>
+      {currentUser == null ? (
+        <>
+          <h1>Anda blm login</h1>
+          <Button onClick={loginHandler}>Login</Button>
+        </>
+      ) : (
+        <>
+          <h1>Hello {currentUser.displayName}</h1>
+          <Button onClick={handleLogout}>Logout</Button>
+        </>
+      )}
       <div className="my-3">
         <Link to={"/add-post"}>
           <Button>Add post</Button>
