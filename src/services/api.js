@@ -59,6 +59,26 @@ export const createPost = async (data) => {
   }
 };
 
+export const createKalkulatorInvestasi = async (data) => {
+  try {
+    const kalkulatorRef = collection(db, "kalkulator_investasi");
+
+    await addDoc(kalkulatorRef, data);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const createKalkulatorY = async (data) => {
+  try {
+    const kalkulatorRef = collection(db, "kalkulator_y");
+
+    await addDoc(kalkulatorRef, data);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const updatePost = async ({ postId, data }) => {
   try {
     const postRef = doc(db, "posts", postId);

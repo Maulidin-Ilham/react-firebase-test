@@ -5,6 +5,9 @@ import DetailPost from "./pages/DetailPost";
 import AddPost from "./pages/AddPost";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/protected-route";
+import Riwayat from "./pages/Riwayat";
+import KalkulatorY from "./pages/KalkulatorY";
+import KalkulatorInvestasi from "./pages/KalkulatorInvestasi";
 
 const App = () => {
   return (
@@ -16,6 +19,30 @@ const App = () => {
           element={
             <ProtectedRoute>
               <AddPost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/riwayat"
+          element={
+            <ProtectedRoute>
+              <Riwayat />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/kalkulator-investasi"
+          element={
+            <ProtectedRoute>
+              <KalkulatorInvestasi />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/kalukator-y"
+          element={
+            <ProtectedRoute>
+              <KalkulatorY />
             </ProtectedRoute>
           }
         />

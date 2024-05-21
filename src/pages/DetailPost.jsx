@@ -56,8 +56,8 @@ const DetailPost = () => {
 
         <div>
           <h1>Detail post: {postId}</h1>
-          <h1>Title: {data?.post.title}</h1>
-          <h1>Post: {data?.post.post}</h1>
+          <h1>Title: {data?.post?.title}</h1>
+          <h1>Post: {data?.post?.post}</h1>
           <p>Author: {data?.post?.author_name}</p>
         </div>
 
@@ -91,12 +91,12 @@ const DetailPost = () => {
           </div>
         )}
         <div className="mt-5">
-          <h1>Comment {data.comments.length}</h1>
+          <h1>Comment {data?.comments?.length}</h1>
           <ul>
-            {data?.comments.length > 0 ? (
+            {data?.comments?.length > 0 ? (
               data?.comments.map((comment) => (
                 <li key={comment.id} className="p-2 mt-2 border rounded">
-                  <h1>{comment.author_name}</h1>
+                  <h1 className="font-semibold">{comment.author_name}</h1>
                   <p>{comment.comment}</p>
                 </li>
               ))

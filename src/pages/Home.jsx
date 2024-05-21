@@ -64,7 +64,7 @@ const Home = () => {
               <div>
                 <h2 className="text-lg font-semibold">Title: {post.title}</h2>
                 <p>Post: {post.post}</p>
-                <p className="text-gray-500">Author: {post.author_name}</p>
+                <p className="text-gray-400">Author: {post.author_name}</p>
               </div>
 
               <div className="flex flex-row gap-3 ">
@@ -119,9 +119,18 @@ const Home = () => {
           <Button onClick={handleLogout}>Logout</Button>
         </>
       )}
-      <div className="my-3">
+      <div className="my-3 flex flex-row space-x-3">
         <Link to={"/add-post"}>
           <Button>Add post</Button>
+        </Link>
+        <Link to={"/riwayat"}>
+          <Button>Riwayat</Button>
+        </Link>
+        <Link to={"/kalkulator-investasi"}>
+          <Button>Kalkulator investasi</Button>
+        </Link>
+        <Link to={"/kalukator-y"}>
+          <Button>Kalkulator Y</Button>
         </Link>
       </div>
       {content}
