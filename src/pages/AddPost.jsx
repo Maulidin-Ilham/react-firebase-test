@@ -7,9 +7,12 @@ import { useCreatePost } from "@/services/mutations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { getAuth } from "firebase/auth";
 
 const AddPost = () => {
   const navigate = useNavigate();
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
   const [title, setTitle] = useState("");
   const [post, setPost] = useState("");
@@ -22,7 +25,12 @@ const AddPost = () => {
     if (!title || !post) return;
 
     await createPost(
-      { title, post },
+      {
+        title,
+        post,
+        author_name: currentUser?.displayName,
+        author_id: currentUser?.uid,
+      },
       {
         onSettled: () => {
           navigate("/");
@@ -44,6 +52,7 @@ const AddPost = () => {
 
       <div>
         <h2 className="text-xl font-semibold text-center">Add post</h2>
+        <h1>{currentUser?.displayName}</h1>
       </div>
 
       <form onSubmit={submitHandler} className="flex flex-col gap-3">

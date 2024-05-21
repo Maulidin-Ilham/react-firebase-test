@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
-import { signOut } from "firebase/auth";
-import { auth } from "@/firebase-config";
+import { getAuth, signOut } from "firebase/auth";
 
 import { usePosts } from "@/services/queries";
 import { useDeletePost, useUpdatePost } from "@/services/mutations";
@@ -12,6 +11,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   // ini untuk ngecek udah login apa blm
+  const auth = getAuth();
   const currentUser = auth.currentUser;
   const { data: posts, isLoading, isSuccess, isError, error } = usePosts();
   const { mutate: deletePost, isPending: isPendingDeletePost } =
@@ -64,6 +64,7 @@ const Home = () => {
               <div>
                 <h2 className="text-lg font-semibold">Title: {post.title}</h2>
                 <p>Post: {post.post}</p>
+                <p className="text-gray-500">Author: {post.author_name}</p>
               </div>
 
               <div className="flex flex-row gap-3 ">

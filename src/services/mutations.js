@@ -46,8 +46,13 @@ export const useCreateCommentPost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, comment }) => {
-      return await createCommentPost({ postId, comment });
+    mutationFn: async ({ postId, comment, author_name, author_id }) => {
+      return await createCommentPost({
+        postId,
+        comment,
+        author_name,
+        author_id,
+      });
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["posts", variables.postId] });

@@ -6,14 +6,15 @@ import { usePost } from "@/services/queries";
 import { useCreateCommentPost } from "@/services/mutations";
 
 import { Button } from "@/components/ui/button";
-import { auth } from "@/firebase-config";
+
+import { getAuth } from "firebase/auth";
 
 const DetailPost = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
 
   const [comment, setComment] = useState("");
-
+  const auth = getAuth();
   const currentUser = auth.currentUser;
   const { data, isLoading, isSuccess, isError, error } = usePost(postId);
   const { mutateAsync: createCommentPost, isPending } = useCreateCommentPost();
@@ -21,8 +22,15 @@ const DetailPost = () => {
   const handleCommentPost = async () => {
     if (!comment) return;
 
+    const author_name = currentUser?.displayName; // Fallback to "Anonymous" if displayName is not set
+    const author_id = currentUser?.uid;
     await createCommentPost(
-      { postId, comment },
+      {
+        postId,
+        comment,
+        author_name,
+        author_id,
+      },
       {
         onSettled: () => {
           setComment("");
@@ -50,6 +58,7 @@ const DetailPost = () => {
           <h1>Detail post: {postId}</h1>
           <h1>Title: {data?.post.title}</h1>
           <h1>Post: {data?.post.post}</h1>
+          <p>Author: {data?.post?.author_name}</p>
         </div>
 
         <div className="flex flex-col gap-2 mt-5">
@@ -87,6 +96,7 @@ const DetailPost = () => {
             {data?.comments.length > 0 ? (
               data?.comments.map((comment) => (
                 <li key={comment.id} className="p-2 mt-2 border rounded">
+                  <h1>{comment.author_name}</h1>
                   <p>{comment.comment}</p>
                 </li>
               ))

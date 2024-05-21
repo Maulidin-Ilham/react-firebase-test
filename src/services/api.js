@@ -91,10 +91,19 @@ export const deletePost = async (postId) => {
   }
 };
 
-export const createCommentPost = async ({ postId, comment }) => {
+export const createCommentPost = async ({
+  postId,
+  comment,
+  author_name,
+  author_id,
+}) => {
   try {
     const commentRef = collection(db, "posts", postId, "comments");
-    await addDoc(commentRef, { comment });
+    await addDoc(commentRef, {
+      comment,
+      author_name,
+      author_id,
+    });
   } catch (error) {
     throw new Error(error);
   }
