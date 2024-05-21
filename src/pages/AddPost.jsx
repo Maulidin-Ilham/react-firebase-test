@@ -1,27 +1,27 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { db } from "@/firebase-config";
-import { addDoc, collection } from "firebase/firestore";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { useCreatePost } from "@/services/mutations";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
 const AddPost = () => {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [post, setPost] = useState("");
-  const navigate = useNavigate();
+
+  const { mutateAsync: createPost, isPending } = useCreatePost();
+
   const submitHandler = async (e) => {
     e.preventDefault();
     if (title.trim() !== "" && post.trim() !== "") {
       try {
         // fungsi firebase buat nambah ke collection "posts"
-        const docRef = collection(db, "posts");
+        await createPost({ title, post });
 
-        // fungsi buat ngisi di collection post tadi
-        await addDoc(docRef, {
-          title: title,
-          post: post,
-        });
         navigate("/");
       } catch (error) {
         console.error("Error adding comment: ", error);
@@ -32,12 +32,12 @@ const AddPost = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center ">
+    <div className="flex flex-col items-center justify-center ">
       <h1>Add post</h1>
 
       <form
         action=""
-        className="flex flex-col space-y-4 w-6/12 "
+        className="flex flex-col w-6/12 space-y-4 "
         onSubmit={submitHandler}
       >
         <div>
@@ -57,11 +57,13 @@ const AddPost = () => {
           />
         </div>
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disbled={isPending}>
+          {isPending ? "Submiting..." : "Submit"}
+        </Button>
       </form>
 
       <Link to={"/"} className="mt-5">
-        <Button className="bg-black hover:bg-gray-600 text-white">Back</Button>
+        <Button className="text-white bg-black hover:bg-gray-600">Back</Button>
       </Link>
     </div>
   );
